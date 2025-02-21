@@ -59,8 +59,8 @@ OUTPUT="$(PRIVATE_KEY=$PRIVATE_KEY \
   npx ocweb --rpc $RPC_URL --skip-tx-validation mint --factory-address $OCWEBSITE_FACTORY_ADDRESS $CHAIN_ID about-me-theme | tee >(cat - >&5))"
 
 # Get the address of the OCWebsite
-OCWEBSITE_ADDRESS=$(echo "$OUTPUT" | grep -oP 'New OCWebsite smart contract: \K0x\w+')
-
+OCWEBSITE_ADDRESS=$(echo "$OUTPUT" | sed -n 's/.*New OCWebsite smart contract: \(0x[a-fA-F0-9]\{40\}\).*/\1/p')
+echo "Extracted OCWEBSITE_ADDRESS: $OCWEBSITE_ADDRESS"
 
 #
 # Build and upload the admin frontend and the main frontend
@@ -95,7 +95,7 @@ npx ocweb --rpc $RPC_URL --skip-tx-validation upload dist/* /
 # 
 
 FORGE_CREATE_OPTIONS=
-if [ "$CHAIN_ID" != "31337" ]; then
+if [ "$CHAIN_ID" != "31337" ] && [ "$CHAIN_ID" != "3335" ]; then
   FORGE_CREATE_OPTIONS="--verify"
 fi
 forge create --broadcast --private-key $PRIVATE_KEY $FORGE_CREATE_OPTIONS \
